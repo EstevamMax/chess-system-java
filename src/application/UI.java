@@ -52,16 +52,30 @@ public class UI {
 		for (int i = 0; i < pieces.length; i++) {
 			System.out.print((8 - i) + " ");
 			for (int j = 0; j < pieces.length; j++) {
-				printPiece(pieces[i][j]);
+				printPiece(pieces[i][j], false);
 			}
 			System.out.println();
 		}
 		System.out.println("  a b c d e f g h");
 	}
 
-	public static void printPiece(ChessPiece piece) { // Método para imprimir a peça na tela
+	public static void printBoard(ChessPiece[][] pieces, boolean[][] possibleMoves) { // Método para imprimir o tabuleiro completo na tela e indicar os possíveis movimentos da peça selecionada
+		for (int i = 0; i < pieces.length; i++) {
+			System.out.print((8 - i) + " ");
+			for (int j = 0; j < pieces.length; j++) {
+				printPiece(pieces[i][j], possibleMoves[i][j]);
+			}
+			System.out.println();
+		}
+		System.out.println("  a b c d e f g h");
+	}
+	
+	public static void printPiece(ChessPiece piece, boolean background) { // Método para imprimir a peça na tela
+		if(background) { //Pinta o fundo de azul indicando os possiveis movimentos da peça baseado nesse boolean
+			System.out.print(ANSI_BLUE_BACKGROUND);
+		}
 		if (piece == null) {
-			System.out.print("-");
+			System.out.print("-" + ANSI_RESET);
 		} else {
 			if (piece.getColor() == Color.WHITE) {
                 System.out.print(ANSI_WHITE + piece + ANSI_RESET);
