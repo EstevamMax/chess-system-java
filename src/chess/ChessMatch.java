@@ -16,6 +16,7 @@ public class ChessMatch {
 	private Color currentPlayer;
 	private Board board;
 	private boolean check;
+	private boolean checkMate;
 	
 	private List<Piece> piecesOnTheBoard = new ArrayList<>();
 	private List<Piece> capturedPieces = new ArrayList<>();
@@ -37,6 +38,10 @@ public class ChessMatch {
 	
 	public boolean getCheck() {
 		return check;
+	}
+	
+	public boolean getCheckMate() {
+		return checkMate;
 	}
 	
 	public ChessPiece[][] getPieces() {
@@ -69,7 +74,13 @@ public class ChessMatch {
 		
 		check = (testCheck(opponent(currentPlayer))) ? true : false; //Se o oponente estiver em check retorna true, caso contrário false
 		
-		nextTurn(); //Método que incrementa o turno atual na partida e muda o jogador
+		if(testCheckMate(opponent(currentPlayer))) {
+			checkMate = true;
+		}
+		else {
+			nextTurn(); //Método que incrementa o turno atual na partida e muda o jogador
+		}
+	
 		return (ChessPiece)capturedPiece; //Downcast de Piece para ChessPiece
 	}
 	
@@ -146,24 +157,42 @@ public class ChessMatch {
 		return false;
 	}
 	
+	private boolean testCheckMate(Color color) {
+		if(!testCheck(color)) {
+			return false;
+		}
+		List<Piece> list = piecesOnTheBoard.stream().filter(x -> ((ChessPiece)x).getColor() == color).collect(Collectors.toList());
+		for(Piece p : list) {
+			boolean[][] mat = p.possibleMoves(); //Matriz auxiliar que pega todos os movimentos possiveis de todas as peças da cor indicada
+			for (int i = 0; i < board.getRows(); i++) {
+				for(int j = 0; j < board.getColumns(); j++) {
+					if(mat[i][j]) { //O if será ativado sempre que alguma peça da matriz ter movimentos possiveis (retornar true)
+						Position source = ((ChessPiece)p).getChessPosition().toPosition(); //Variável auxiliar que salva a posição da peça 'p'
+						Position target = new Position(i, j); //Váriavel auxiliar que salva o movimento possível identificado na matriz
+						Piece capturedPiece = makeMove(source, target); //Auxiliar que faz o movimento identificado anteriormente
+						boolean testCheck = testCheck(color);
+						undoMove(source, target, capturedPiece); //Disfaz todo o movimento anterior
+						if(!testCheck) { //Caso continue em check retorna true, pelo contrário retorna false e nega o check mate
+							return false;
+						}
+					}
+				}
+			}
+		}
+		return true;
+	}
+	
 	private void placeNewPiece(char column, int row, ChessPiece piece) { //Método para adicionar peças ao jogo
 		board.placePiece(piece, new ChessPosition(column, row).toPosition());
 		piecesOnTheBoard.add(piece);
 	}
 	
 	private void initialSetup() { //Instanciação das peças no início da partida.
-		placeNewPiece('c', 1, new Rook(board, Color.WHITE));
-        placeNewPiece('c', 2, new Rook(board, Color.WHITE));
-        placeNewPiece('d', 2, new Rook(board, Color.WHITE));
-        placeNewPiece('e', 2, new Rook(board, Color.WHITE));
-        placeNewPiece('e', 1, new Rook(board, Color.WHITE));
-        placeNewPiece('d', 1, new King(board, Color.WHITE));
-
-        placeNewPiece('c', 7, new Rook(board, Color.BLACK));
-        placeNewPiece('c', 8, new Rook(board, Color.BLACK));
-        placeNewPiece('d', 7, new Rook(board, Color.BLACK));
-        placeNewPiece('e', 7, new Rook(board, Color.BLACK));
-        placeNewPiece('e', 8, new Rook(board, Color.BLACK));
-        placeNewPiece('d', 8, new King(board, Color.BLACK));
+		placeNewPiece('h', 7, new Rook(board, Color.WHITE));
+		placeNewPiece('d', 1, new Rook(board, Color.WHITE));
+		placeNewPiece('e', 1, new King(board, Color.WHITE));
+		
+		placeNewPiece('b', 8, new Rook(board, Color.BLACK));
+		placeNewPiece('a', 8, new King(board, Color.BLACK));
 	}
 }
