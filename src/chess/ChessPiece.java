@@ -17,6 +17,10 @@ public abstract class ChessPiece extends Piece {
 		return color;
 	}
 	
+	public ChessPosition getChessPosition() {
+		return ChessPosition.fromPosition(position);
+	}
+	
 	protected boolean isThereOpponentPiece(Position position) {
 		ChessPiece p = (ChessPiece)getBoard().piece(position); //Variável que pega a peça posicionada na casa destinada
 		return p != null && p.getColor() != color; //Verifica se existe uma peça na casa destinada e se a mesma é de cor diferente da peça de origem
