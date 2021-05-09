@@ -85,7 +85,8 @@ public class ChessMatch {
 	}
 	
 	private Piece makeMove(Position source, Position target) {
-		Piece p = board.removePiece(source); //remove a peça da posição inicial
+		ChessPiece p = (ChessPiece)board.removePiece(source); //remove a peça da posição inicial
+		p.increaseMoveCount();
 		Piece capturedPiece = board.removePiece(target); //move a peça para a posição desejada capturando a peça que estiver lá
 		board.placePiece(p, target); //colocando a peça desejada na posição informada anteriormente
 		
@@ -98,7 +99,8 @@ public class ChessMatch {
 	}
 	
 	private void undoMove(Position source, Position target, Piece capturedPiece) { //Método para desfazer o movimento feito anteriormente em "makeMove"
-		Piece p = board.removePiece(target); //Remove a peça da posição ocupada anteriormente
+		ChessPiece p = (ChessPiece)board.removePiece(target); //Remove a peça da posição ocupada anteriormente
+		p.decreaseMoveCount();
 		board.placePiece(p, source); //volta ela para a posição inicial
 		
 		if(capturedPiece != null) { //verifica se houve alguma captura de peça
